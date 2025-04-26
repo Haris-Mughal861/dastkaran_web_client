@@ -1,13 +1,17 @@
-import React from 'react'
+import React,{} from 'react'
 import './auth.css';
 import {Formik, Form} from 'formik'
 import { TextField, Button } from '@mui/material';
 import{Link} from 'react-router-dom'
 import * as Yup from 'yup';
-
+import httpAction from '../../utils/httpAction';
+import apis from '../../utils/apis';
+import useProvideHooks from '../../hooks/useProvideHooks';
+import toast from 'react-hot-toast';
 
 
 function Login() {
+    const {dispatch,loading, setLoading}= useProvideHooks()
 
     
     const initialValue = {
@@ -24,8 +28,22 @@ function Login() {
 
     });
 
-    const submitHandler = ()=>{}
+    const submitHandler = async (values)=>{
+        const data = {
+            url: apis().loginUser,
+            method:'POST',
+            body: {...values},
+        };
+        setLoading(true)
+        const result = await dispatch(httpAction(data))
+        setLoading(false)
+        if(result?.status){
+            toast.success(result?.message);
+            console.log(result)
+        }
+    }
     return (
+
         <div className='auth_main'>
     
             <div className ="auth_header">
@@ -62,10 +80,14 @@ function Login() {
                 type='password'
                 size='small' 
                 fullWidth/>
-               <Button type='submit'
+               <Button 
+               disabled = {loading}
+               type='submit'
                 variant='contained'
                  fullWidth
-                  color='primary'>Login</Button>
+                  color='primary'>
+                    {loading?'wait...':"login"}
+                    </Button>
                <div className='auth_options'>
                 <Link to ='/register'>Create a new Account?</Link>
                </div>

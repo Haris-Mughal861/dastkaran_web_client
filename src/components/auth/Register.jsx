@@ -9,9 +9,10 @@ import toast from 'react-hot-toast';
 import useProvideHooks from '../../hooks/useProvideHooks';
 import apis from "../../utils/apis";
 
+
 const Register = () => {
  
-  const {loading,setLoading,dispatch}= useProvideHooks();
+  const {loading,setLoading,dispatch,navigate}= useProvideHooks();
   
   
 
@@ -29,27 +30,29 @@ const Register = () => {
 
   const submitHandler = async (values) => {
     const data = {
-      url: apis().rigisterUser,
+      url: apis.rigisterUser, 
       method: "POST",
       body: { ...values },
-      
     };
+  
     setLoading(true);
   
-  
+    try {
       const result = await dispatch(httpAction(data));
       setLoading(false);
   
       if (result?.status) {
         toast.success(result?.message);
-  
-    
+        navigate('/login');
+      } else {
+        toast.error(result?.message || "Registration failed");
+      }
+    } catch (error) {
+      setLoading(false);
+      console.error("Submit error:", error);
+      toast.error("Something went wrong. Please try again.");
     }
-  
-  
-     
   };
-
   return (
     <div className="auth_main">
       <div className="auth_header">
